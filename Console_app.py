@@ -1,7 +1,7 @@
-import Michigan
-import Pitt_direct
-import Pitt_perm
-import Common
+import scheduler.methods.Michigan as Michigan
+import scheduler.methods.Pitt_direct as Pitt_direct
+import scheduler.methods.Pitt_perm as Pitt_perm
+import scheduler.Common as Common
 
 import time
 

@@ -18,7 +18,7 @@ def read_machines(features):
 
     :return: macierz maszyn
     """
-    machines_filename = "data/M20_security_features.csv"
+    machines_filename = "scheduler/data/M20_security_features.csv"
     skip_rows = [0, 1]
     column_delimiter = ';'
     column_names = ['CC', 'cores', 'P_busy', 'P_idle', 'A', 'B', 'C', 'D', 'E']
@@ -36,7 +36,7 @@ def read_tasks(features):
 
     :return: macierz zadań
     """
-    tasks_filename = "data/T200_security_features.csv"
+    tasks_filename = "scheduler/data/T200_security_features.csv"
     skip_rows = [0, 1]
     column_delimiter = ';'
     column_names = ['WL_seq', 'WL_par', 'A', 'B', 'C', 'D', 'E']
@@ -82,7 +82,7 @@ def read_security_features():
 
     :return: macierz cecha-waga
     """
-    security_features_filename = "data/security_features_list.csv"
+    security_features_filename = "scheduler/data/security_features_list.csv"
     skip_rows = [0]
     column_delimiter = ';'
     column_names = ['security_feature', 'weight']

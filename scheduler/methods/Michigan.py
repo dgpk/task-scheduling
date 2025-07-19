@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from sklearn.utils import shuffle
 
-import Common
+import scheduler.Common as Common
 
 columns = ''
 
@@ -403,7 +403,7 @@ def write_to_csv(best_score, population, etc, machines, max_time):
     :param population: population
     :param etc: macierz etc
     """
-    with open('results/output_michigan.csv', 'w', newline='') as csvfile:
+    with open('scheduler/results/output_michigan.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile, delimiter=';', quoting=csv.QUOTE_NONNUMERIC)
         writer.writerow(['{} optimized'.format(Common.scheduling_modes[Common.scheduling_mode]), ('%f' % best_score).replace('.', ',')])
         
@@ -481,7 +481,7 @@ def main():
     # zapis wyniku do pliku csv
     write_to_csv(best_score, pop.sort_index(), etc, machines, max_time)
 
-    open('results/result_michigan', 'a').write(str(best_score) + "," + str(other_param) + "\n")
+    open('scheduler/results/result_michigan', 'a').write(str(best_score) + "," + str(other_param) + "\n")
 
 
 if __name__ == "__main__":

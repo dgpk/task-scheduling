@@ -138,6 +138,11 @@ pip-selfcheck.json
 # IntelliJ
 /out/
 
+#vscode
+.vscode/
+.DS_Store
+
+
 # mpeltonen/sbt-idea plugin
 .idea_modules/
 
@@ -153,4 +158,3 @@ fabric.properties
 
 # custom
 results/
-.vscode/
