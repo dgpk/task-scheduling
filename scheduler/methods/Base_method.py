@@ -2,10 +2,12 @@ from abc import ABC, abstractmethod
 import numpy as np
 import pandas as pd
 
+
 class BaseMethod(ABC):
     """
     Abstrakcyjna klasa bazowa (interfejs) dla wszystkich metod harmonogramowania.
     """
+
     def __init__(self, machines_df: pd.DataFrame, tasks_df: pd.DataFrame, etc_matrix: np.ndarray):
         self.machines_df = machines_df
         self.tasks_df = tasks_df

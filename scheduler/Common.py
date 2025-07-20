@@ -1,16 +1,17 @@
-import numpy as np 
+import numpy as np
 import pandas as pd
 
 MAKESPAN_MODE = 0
 ENERGY_MODE = 1
-scheduling_modes = {MAKESPAN_MODE:"makespan", ENERGY_MODE:"energy"}
+scheduling_modes = {MAKESPAN_MODE: "makespan", ENERGY_MODE: "energy"}
 scheduling_mode = 0
 
 MAKESPAN_O_MODE = 0
 ENERGY_O_MODE = 1
 ALL_O_MODE = 2
-output_modes = {MAKESPAN_O_MODE:"makespan", ENERGY_O_MODE:"energy", ALL_O_MODE:"all"}
+output_modes = {MAKESPAN_O_MODE: "makespan", ENERGY_O_MODE: "energy", ALL_O_MODE: "all"}
 output_mode = 0
+
 
 def read_machines(features):
     """
@@ -20,13 +21,22 @@ def read_machines(features):
     """
     machines_filename = "scheduler/data/M20_security_features.csv"
     skip_rows = [0, 1]
-    column_delimiter = ';'
-    column_names = ['CC', 'cores', 'P_busy', 'P_idle', 'A', 'B', 'C', 'D', 'E']
-    machines = pd.read_csv(machines_filename, skiprows=skip_rows, delimiter=column_delimiter, index_col=False, names=column_names)
+    column_delimiter = ";"
+    column_names = ["CC", "cores", "P_busy", "P_idle", "A", "B", "C", "D", "E"]
+    machines = pd.read_csv(
+        machines_filename,
+        skiprows=skip_rows,
+        delimiter=column_delimiter,
+        index_col=False,
+        names=column_names,
+    )
 
     for machine_id in machines.index.values:
         if not are_security_features_correct(machines.iloc[machine_id], features):
-            raise Exception("Machine features greater than defined. Machine:\n" + machines.iloc[machine_id].to_string())
+            raise Exception(
+                "Machine features greater than defined. Machine:\n"
+                + machines.iloc[machine_id].to_string()
+            )
     return machines
 
 
@@ -38,12 +48,21 @@ def read_tasks(features):
     """
     tasks_filename = "scheduler/data/T200_security_features.csv"
     skip_rows = [0, 1]
-    column_delimiter = ';'
-    column_names = ['WL_seq', 'WL_par', 'A', 'B', 'C', 'D', 'E']
-    tasks = pd.read_csv(tasks_filename, skiprows=skip_rows, delimiter=column_delimiter, index_col=False, names=column_names)
+    column_delimiter = ";"
+    column_names = ["WL_seq", "WL_par", "A", "B", "C", "D", "E"]
+    tasks = pd.read_csv(
+        tasks_filename,
+        skiprows=skip_rows,
+        delimiter=column_delimiter,
+        index_col=False,
+        names=column_names,
+    )
     for task_id in tasks.index.values:
         if not are_security_features_correct(tasks.iloc[task_id], features):
-            raise Exception("Task features requirements greater than defined. Task:\n" + tasks.iloc[task_id].to_string())
+            raise Exception(
+                "Task features requirements greater than defined. Task:\n"
+                + tasks.iloc[task_id].to_string()
+            )
     return tasks
 
 
@@ -62,7 +81,9 @@ def generate_etc_matrix(machines, tasks):
     :param tasks: macierz zadań
     :return: macierz ETC
     """
-    new_etc = np.zeros(shape=(len(tasks), len(machines)), dtype=np.float64)  # utworzenie pustej tablicy
+    new_etc = np.zeros(
+        shape=(len(tasks), len(machines)), dtype=np.float64
+    )  # utworzenie pustej tablicy
 
     for task_id in tasks.index.values:  # iteracja po wszystkich zadaniach
         wls = tasks.values[task_id][0]  # liczba operacji których NIE MOŻNA zrównoleglić
@@ -84,9 +105,15 @@ def read_security_features():
     """
     security_features_filename = "scheduler/data/security_features_list.csv"
     skip_rows = [0]
-    column_delimiter = ';'
-    column_names = ['security_feature', 'weight']
-    feature_matrix = pd.read_csv(security_features_filename, skiprows=skip_rows, delimiter=column_delimiter, index_col=False, names=column_names)
+    column_delimiter = ";"
+    column_names = ["security_feature", "weight"]
+    feature_matrix = pd.read_csv(
+        security_features_filename,
+        skiprows=skip_rows,
+        delimiter=column_delimiter,
+        index_col=False,
+        names=column_names,
+    )
     return feature_matrix
 
 
@@ -123,12 +150,13 @@ def can_execute_task_on_machine(machine, task, features):
 
     return True
 
+
 def check_task_machine_mapping(machines, tasks, features, mappings):
     """
     Sprawdzenie czy dane przypisanie maszyn do zadań jest prawidłowe.
     :param machines: macierz maszyn
     :param tasks: macierz zadań
-    :param mappings: przypisanie poszczegolnych zadań do maszyn w formacie: 
+    :param mappings: przypisanie poszczegolnych zadań do maszyn w formacie:
         [task_id, task_id, task_id, ...]
         gdzie indeks w tabeli jest równy id maszyny, a każda wartość przedstawia id zadania
     :return True jesli dopasowanie jest poprawne, False w przeciwnym wypadku
@@ -141,4 +169,3 @@ def check_task_machine_mapping(machines, tasks, features, mappings):
             return False
 
     return True
-

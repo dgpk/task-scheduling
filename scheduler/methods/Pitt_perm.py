@@ -4,8 +4,10 @@ import random
 import math
 
 import scheduler.Common as Common
+
 # POPRAWKA: Import z pliku pisanego małymi literami
 from scheduler.methods.Base_method import BaseMethod
+
 
 class PittPermMethod(BaseMethod):
     """Implementacja algorytmu Pitt z reprezentacją permutacyjną."""
@@ -20,9 +22,9 @@ class PittPermMethod(BaseMethod):
         return [tuple(self._generate_individual()) for _ in range(pop_size)]
 
     def evaluate_population(self, population):
-        best_score = float('inf')
+        best_score = float("inf")
         best_individual = None
-        other_param_for_best = float('inf')
+        other_param_for_best = float("inf")
 
         for individual in population:
             score, other_param = self._get_metrics_for_individual(individual)
@@ -30,14 +32,14 @@ class PittPermMethod(BaseMethod):
                 best_score = score
                 best_individual = individual
                 other_param_for_best = other_param
-        
+
         return best_score, best_individual, other_param_for_best
 
     def crossover(self, population):
         shuffled_population = shuffle(population)
         new_population = []
         for i in range(0, len(shuffled_population) - 1, 2):
-            parent1, parent2 = shuffled_population[i], shuffled_population[i+1]
+            parent1, parent2 = shuffled_population[i], shuffled_population[i + 1]
             child1_tasks, child2_tasks = self._ordered_crossover(parent1[0], parent2[0])
             new_population.append((child1_tasks, parent1[1]))
             new_population.append((child2_tasks, parent2[1]))
@@ -47,8 +49,8 @@ class PittPermMethod(BaseMethod):
 
     def mutation(self, population):
         mutated_pop = []
-        pm_s = self.kwargs.get('mutation_rate_s', 0.01)
-        pm_t = self.kwargs.get('mutation_rate_t', 0.01)
+        pm_s = self.kwargs.get("mutation_rate_s", 0.01)
+        pm_t = self.kwargs.get("mutation_rate_t", 0.01)
 
         for ind in population:
             tasks_list, machines_list = list(ind[0]), list(ind[1])
@@ -56,7 +58,9 @@ class PittPermMethod(BaseMethod):
                 if random.random() < pm_s:
                     tasks_list, machines_list = self._swap_mutation((tasks_list, machines_list), i)
                 if random.random() < pm_t:
-                    tasks_list, machines_list = self._transposition_mutation((tasks_list, machines_list), i)
+                    tasks_list, machines_list = self._transposition_mutation(
+                        (tasks_list, machines_list), i
+                    )
             mutated_pop.append((tuple(tasks_list), tuple(machines_list)))
         return mutated_pop
 
@@ -76,8 +80,11 @@ class PittPermMethod(BaseMethod):
         for task_id in self.tasks_df.index:
             task = self.tasks_df.loc[task_id]
             possible_machines = [
-                m_id for m_id in self.machines_df.index 
-                if Common.can_execute_task_on_machine(self.machines_df.loc[m_id], task, Common.read_security_features())
+                m_id
+                for m_id in self.machines_df.index
+                if Common.can_execute_task_on_machine(
+                    self.machines_df.loc[m_id], task, Common.read_security_features()
+                )
             ]
             tasks_to_machines_map[task_id] = possible_machines
         return tasks_to_machines_map
@@ -89,7 +96,7 @@ class PittPermMethod(BaseMethod):
         machines_chromosome = [base_tasks] * num_machines
         for i in range(num_tasks % num_machines):
             machines_chromosome[i] += 1
-        
+
         machines_to_tasks = {i: [] for i in self.machines_df.index}
         sorted_tasks = sorted(self.tasks_to_machines.items(), key=lambda item: len(item[1]))
 
@@ -101,13 +108,15 @@ class PittPermMethod(BaseMethod):
                     machines_to_tasks[m_id].append(task_id)
                     assigned = True
                     break
-            if not assigned: # Fallback if initial distribution is too strict
+            if not assigned:  # Fallback if initial distribution is too strict
                 m_id = random.choice(possible_machines)
                 machines_to_tasks[m_id].append(task_id)
 
-        tasks_chromosome = [task for tasks_list in machines_to_tasks.values() for task in tasks_list]
+        tasks_chromosome = [
+            task for tasks_list in machines_to_tasks.values() for task in tasks_list
+        ]
         final_machines_chromosome = [len(tasks) for tasks in machines_to_tasks.values()]
-        
+
         return tasks_chromosome, final_machines_chromosome
 
     def _get_machine_for_task_pos(self, individual, task_pos):
@@ -122,11 +131,14 @@ class PittPermMethod(BaseMethod):
         tasks, machines = individual
         num_tasks = len(tasks)
         j = random.randrange(num_tasks)
-        
+
         machine_of_i = self._get_machine_for_task_pos(individual, i)
         machine_of_j = self._get_machine_for_task_pos(individual, j)
 
-        if machine_of_j in self.tasks_to_machines[tasks[i]] and machine_of_i in self.tasks_to_machines[tasks[j]]:
+        if (
+            machine_of_j in self.tasks_to_machines[tasks[i]]
+            and machine_of_i in self.tasks_to_machines[tasks[j]]
+        ):
             tasks[i], tasks[j] = tasks[j], tasks[i]
         return tasks, machines
 
@@ -134,7 +146,7 @@ class PittPermMethod(BaseMethod):
         tasks, machines = individual
         num_tasks = len(tasks)
         j = random.randrange(num_tasks)
-        
+
         original_machine_idx = self._get_machine_for_task_pos(individual, i)
         target_machine_idx = self._get_machine_for_task_pos(individual, j)
 
@@ -152,13 +164,13 @@ class PittPermMethod(BaseMethod):
         """
         size = len(dad)
         son, daughter = [-1] * size, [-1] * size
-        
+
         start, end = sorted([random.randrange(size) for _ in range(2)])
-        
+
         # --- Tworzenie potomka 1 (son) ---
-        son[start:end+1] = dad[start:end+1]
+        son[start : end + 1] = dad[start : end + 1]
         mom_genes_to_add = [gene for gene in mom if gene not in son]
-        
+
         mom_genes_ptr = 0
         for i in range(size):
             if son[i] == -1:
@@ -166,15 +178,15 @@ class PittPermMethod(BaseMethod):
                 mom_genes_ptr += 1
 
         # --- Tworzenie potomka 2 (daughter) ---
-        daughter[start:end+1] = mom[start:end+1]
+        daughter[start : end + 1] = mom[start : end + 1]
         dad_genes_to_add = [gene for gene in dad if gene not in daughter]
-        
+
         dad_genes_ptr = 0
         for i in range(size):
             if daughter[i] == -1:
                 daughter[i] = dad_genes_to_add[dad_genes_ptr]
                 dad_genes_ptr += 1
-                
+
         return tuple(son), tuple(daughter)
 
     def _get_metrics_for_individual(self, individual):
@@ -186,13 +198,13 @@ class PittPermMethod(BaseMethod):
                 task_id = tasks_chromosome[task_offset + i]
                 machine_times[m_idx] += self.etc_matrix[task_id][m_idx]
             task_offset += num_tasks
-        
+
         makespan = max(machine_times) if machine_times else 0
         total_energy = 0
         for m_idx, busy_time in enumerate(machine_times):
             idle_time = makespan - busy_time
-            p_busy = self.machines_df.iloc[m_idx]['P_busy']
-            p_idle = self.machines_df.iloc[m_idx]['P_idle']
+            p_busy = self.machines_df.iloc[m_idx]["P_busy"]
+            p_idle = self.machines_df.iloc[m_idx]["P_idle"]
             total_energy += (busy_time * p_busy) + (idle_time * p_idle)
 
         if Common.scheduling_mode == Common.ENERGY_MODE:

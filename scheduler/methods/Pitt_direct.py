@@ -1,7 +1,9 @@
 import random
 import scheduler.Common as Common
+
 # POPRAWKA: Import z poprawnej nazwy pliku
 from scheduler.methods.Base_method import BaseMethod
+
 
 class PittDirectMethod(BaseMethod):
     """Implementacja algorytmu Pitt z reprezentacją bezpośrednią."""
@@ -13,9 +15,9 @@ class PittDirectMethod(BaseMethod):
         return [self._generate_one_individual() for _ in range(pop_size)]
 
     def evaluate_population(self, population):
-        best_score = float('inf')
+        best_score = float("inf")
         best_individual = None
-        other_param_for_best = float('inf')
+        other_param_for_best = float("inf")
 
         for individual in population:
             score, other_param = self._get_metrics_for_individual(individual)
@@ -23,19 +25,19 @@ class PittDirectMethod(BaseMethod):
                 best_score = score
                 best_individual = individual
                 other_param_for_best = other_param
-        
+
         return best_score, best_individual, other_param_for_best
 
     def crossover(self, population):
         new_population = []
         for i in range(0, len(population), 2):
-            parent1, parent2 = population[i], population[i+1]
+            parent1, parent2 = population[i], population[i + 1]
             child1, child2 = self._crossover_pair(parent1, parent2)
             new_population.extend([child1, child2])
         return new_population
 
     def mutation(self, population):
-        pm = self.kwargs.get('mutation_rate', 0.01)
+        pm = self.kwargs.get("mutation_rate", 0.01)
         return [self._mutate_individual(ind, pm) for ind in population]
 
     def get_tasks_on_machines_list(self, individual):
@@ -51,19 +53,19 @@ class PittDirectMethod(BaseMethod):
         num_tasks = len(self.tasks_df)
         num_machines = len(self.machines_df)
         individual = [-1] * num_tasks
-        
+
         # Ensure each machine gets at least one task if possible
         assigned_machines = list(range(num_machines))
         random.shuffle(assigned_machines)
         for i in range(min(num_tasks, num_machines)):
             individual[i] = assigned_machines[i]
-        
+
         # Assign remaining tasks
         for i in range(num_machines, num_tasks):
             individual[i] = random.randrange(num_machines)
-        
-        random.shuffle(individual) # Shuffle to make it random
-        
+
+        random.shuffle(individual)  # Shuffle to make it random
+
         # A simple validation/repair step could be added here if needed
         # to ensure all tasks can run on their assigned machines.
         # For now, we assume the random assignment is valid enough for a start.
@@ -91,13 +93,13 @@ class PittDirectMethod(BaseMethod):
         machine_times = [0.0] * len(self.machines_df)
         for task_id, machine_id in enumerate(individual):
             machine_times[machine_id] += self.etc_matrix[task_id][machine_id]
-        
+
         makespan = max(machine_times) if machine_times else 0
         total_energy = 0
         for m_idx, busy_time in enumerate(machine_times):
             idle_time = makespan - busy_time
-            p_busy = self.machines_df.iloc[m_idx]['P_busy']
-            p_idle = self.machines_df.iloc[m_idx]['P_idle']
+            p_busy = self.machines_df.iloc[m_idx]["P_busy"]
+            p_idle = self.machines_df.iloc[m_idx]["P_idle"]
             total_energy += (busy_time * p_busy) + (idle_time * p_idle)
 
         if Common.scheduling_mode == Common.ENERGY_MODE:

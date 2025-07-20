@@ -1,0 +1,14 @@
+# filepath: /Users/balicz3k/Documents/studies/task-scheduling/.pre-commit-config.yaml
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+    -   id: check-yaml
+    -   id: check-added-large-files
+-   repo: https://github.com/psf/black
+    rev: 24.4.2
+    hooks:
+    -   id: black
+        args: [--line-length=100]
